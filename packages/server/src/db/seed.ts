@@ -39,8 +39,8 @@ async function seed() {
 
   // 3. Create default demo tenant
   await query(
-    `INSERT INTO tenants (id, name, slug, status, bot_persona)
-     VALUES ($1, $2, $3, 'active', $4)
+    `INSERT INTO tenants (id, name, slug, status, bot_persona, llm_provider, llm_model, embedding_provider, embedding_model)
+     VALUES ($1, $2, $3, 'active', $4, 'gemini', 'gemini-1.5-flash', 'gemini', 'text-embedding-004')
      ON CONFLICT DO NOTHING`,
     [
       'd3b07384-d113-4ec6-a5d9-48248bc8fc0f',
@@ -50,6 +50,16 @@ async function seed() {
     ]
   );
   console.log('  ✅ Default demo tenant created (slug: demo)');
+
+  // 4. Force all tenants to use Gemini to bypass OpenAI API quota failures
+  await query(
+    `UPDATE tenants SET 
+       llm_provider = 'gemini', 
+       llm_model = 'gemini-1.5-flash', 
+       embedding_provider = 'gemini', 
+       embedding_model = 'text-embedding-004'`
+  );
+  console.log('  ✅ All existing tenants updated to use Google Gemini');
 
   console.log('✅ Seeding complete.');
   await pool.end();
