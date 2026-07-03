@@ -201,6 +201,59 @@ import OpenAI, { toFile } from 'openai';
 import { config } from '../../config/index.js';
 
 export async function transcribeAudio(buffer: Buffer, originalName: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY || config.openai.apiKey;
+  if (!apiKey) {
+    throw new Error('Neither GEMINI_API_KEY nor OPENAI_API_KEY is configured');
+  }
+
+  // If we have a Gemini API key, use Gemini for native multimodal transcription
+  if (process.env.GEMINI_API_KEY) {
+    const ext = originalName.split('.').pop()?.toLowerCase();
+    let mimeType = 'audio/mp3';
+    if (ext === 'wav') mimeType = 'audio/wav';
+    if (ext === 'ogg') mimeType = 'audio/ogg';
+    if (ext === 'm4a') mimeType = 'audio/m4a';
+    if (ext === 'mp4') mimeType = 'video/mp4';
+    if (ext === 'webm') mimeType = 'video/webm';
+
+    const base64Data = buffer.toString('base64');
+
+    const payload = {
+      contents: {
+        parts: [
+          {
+            inlineData: {
+              mimeType,
+              data: base64Data,
+            }
+          },
+          {
+            text: 'Please transcribe this file accurately. Write down the transcription of the audio verbatim. Do not add any explanation, metadata, introduction, or notes.'
+          }
+        ]
+      }
+    };
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await res.json() as any;
+
+    if (!res.ok) {
+      console.error('Gemini Transcription Error:', JSON.stringify(data, null, 2));
+      throw new Error(data.error?.message || 'Gemini transcription failed');
+    }
+
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  // Fallback to OpenAI Whisper
   const openai = new OpenAI({ apiKey: config.openai.apiKey });
   const file = await toFile(buffer, originalName);
   const response = await openai.audio.transcriptions.create({
