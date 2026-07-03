@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot Widget Integration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: rgba(20, 20, 25, 0.6);
+      --primary: #6c63ff;
+      --primary-glow: rgba(108, 99, 255, 0.15);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --border: rgba(255, 255, 255, 0.08);
+      --font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(108, 99, 255, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.08) 0px, transparent 50%);
+      color: var(--text);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(108, 99, 255, 0.1);
+      border: 1px solid rgba(108, 99, 255, 0.25);
+      color: #a78bfa;
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: clamp(16px, 2.5vw, 18px);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px auto;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      text-align: left;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-description {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .code-block {
+      background: #020205;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 13px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .code-tag { color: #f43f5e; }
+    .code-attr { color: #38bdf8; }
+    .code-val { color: #fbbf24; }
+
+    .btn-copy {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: var(--font-family);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-copy:active {
+      transform: translateY(0);
+    }
+
+    .features-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .feature-icon {
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .footer {
+      margin-top: 48px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.02); opacity: 0.95; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="badge">
+      <span style="font-size: 8px;">●</span> Live Integration Ready
+    </div>
+
+    <h1>Embeddable Chat Widget</h1>
+    <p class="subtitle">Integrate a premium AI-powered chatbot into your business website in under 5 seconds.</p>
+
+    <div class="card">
+      <h3 class="card-title">🔌 Embedding Code</h3>
+      <p class="card-description">Copy and paste this script tag at the bottom of your HTML body to load the AI Chatbot. Make sure to replace the <code>data-tenant</code> slug with your own.</p>
+      
+      <div class="code-block" id="embed-code">
+        <button class="btn-copy" onclick="copyCode()">Copy Code</button>
+        <pre><code><span class="code-tag">&lt;script</span>
+  <span class="code-attr">src</span>=<span class="code-val">"https://ai-chatbot-widget-rho.vercel.app/widget.js"</span>
+  <span class="code-attr">data-tenant</span>=<span class="code-val">"demo"</span>
+  <span class="code-attr">data-server</span>=<span class="code-val">"https://backend-server-production-30da.up.railway.app"</span>
+  <span class="code-attr">data-color</span>=<span class="code-val">"#6c63ff"</span>
+  <span class="code-attr">data-position</span>=<span class="code-val">"right"</span><span class="code-tag">&gt;&lt;/script&gt;</span></code></pre>
+      </div>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <span class="feature-icon">✓</span> Beautiful isolated Shadow DOM
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">✓</span> Fully responsive mobile design
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">✓</span> Fast weight & zero external libs
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Powered by AI Chatbot Platform &copy; 2026
+    </div>
+  </div>
+
+  <script>
+    function copyCode() {
+      const codeText = `<script src="https://ai-chatbot-widget-rho.vercel.app/widget.js" data-tenant="demo" data-server="https://backend-server-production-30da.up.railway.app" data-color="#6c63ff" data-position="right"><\\/script>`;
+      navigator.clipboard.writeText(codeText.replace('\\\\', ''));
+      const btn = document.querySelector('.btn-copy');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Code', 2000);
+    }
+  </script>
+
+  <!-- Embed the live widget directly on this page for demonstration! -->
+  <script 
+    src="/widget.js" 
+    data-tenant="demo" 
+    data-server="https://backend-server-production-30da.up.railway.app"
+    data-color="#6c63ff"
+    data-position="right">
+  </script>
+
+</body>
+</html>

@@ -33,8 +33,25 @@ const server = createServer(app);
 
 // ---- Global Middleware ----
 app.use(helmet({ contentSecurityPolicy: false }));
+const allowedOrigins = [
+  config.frontendUrl,
+  config.widgetOrigin,
+  'https://ai-chatbot-web.vercel.app',
+  'https://ai-chatbot-widget.vercel.app'
+].flatMap(url => url ? url.split(',').map(s => s.trim()) : []);
+
 app.use(cors({
-  origin: [config.frontendUrl, config.widgetOrigin].filter(Boolean),
+  origin: (origin, callback) => {
+    if (!origin || 
+        allowedOrigins.includes(origin) || 
+        allowedOrigins.includes('*') || 
+        origin.endsWith('.vercel.app')
+    ) {
+      callback(null, true);
+    } else {
+      callback(null, false); // Fail silently or callback error
+    }
+  },
   credentials: true,
 }));
 app.use(morgan('short'));

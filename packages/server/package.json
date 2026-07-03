@@ -6,8 +6,8 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -b --force",
-    "start": "node dist/index.js",
+    "build": "tsc -b --force && node -e \"const fs = require('fs'); const path = require('path'); const src = 'src/db/migrations'; const dest = 'dist/db/migrations'; if (fs.existsSync(src)) { fs.mkdirSync(dest, { recursive: true }); fs.readdirSync(src).filter(f => f.endsWith('.sql')).forEach(f => fs.copyFileSync(path.join(src, f), path.join(dest, f))); console.log('SQL Migrations copied successfully'); }\"",
+    "start": "node dist/db/migrate.js && node dist/db/seed.js && node dist/index.js",
     "db:migrate": "tsx src/db/migrate.ts",
     "db:seed": "tsx src/db/seed.ts",
     "test": "vitest run",

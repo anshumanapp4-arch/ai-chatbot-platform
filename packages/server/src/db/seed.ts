@@ -37,6 +37,20 @@ async function seed() {
   );
   console.log(`  ✅ Super admin created: ${config.admin.email}`);
 
+  // 3. Create default demo tenant
+  await query(
+    `INSERT INTO tenants (id, name, slug, status, bot_persona)
+     VALUES ($1, $2, $3, 'active', $4)
+     ON CONFLICT DO NOTHING`,
+    [
+      'd3b07384-d113-4ec6-a5d9-48248bc8fc0f',
+      'Demo Company',
+      'demo',
+      'You are a helpful customer support bot for Demo Company.'
+    ]
+  );
+  console.log('  ✅ Default demo tenant created (slug: demo)');
+
   console.log('✅ Seeding complete.');
   await pool.end();
 }
