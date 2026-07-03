@@ -21,7 +21,6 @@ COPY packages/server ./packages/server
 
 # Build TypeScript
 RUN npm run build:shared
-RUN ls -la packages/shared/dist
 RUN npm run build:server
 
 # Step 2: Runner stage
