@@ -18,6 +18,7 @@
     "build:web": "npm run build -w packages/web",
     "build:widget": "npm run build -w widget",
     "build": "npm run build:shared && npm run build:server && npm run build:web && npm run build:widget",
+    "start": "npm run start -w packages/server",
     "test": "npm run test --workspaces --if-present",
     "db:migrate": "npm run db:migrate -w packages/server",
     "db:seed": "npm run db:seed -w packages/server",
