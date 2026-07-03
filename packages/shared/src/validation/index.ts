@@ -23,7 +23,7 @@ export const createTenantSchema = z.object({
     .min(2, 'Slug must be at least 2 characters')
     .max(100)
     .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
-  website_url: z.string().url('Invalid URL').optional().nullable(),
+  website_url: z.string().url('Invalid URL').or(z.literal('')).optional().nullable(),
   llm_provider: z.enum(['openai', 'gemini', 'claude']).default('openai'),
   llm_model: z.string().default('gpt-4o'),
   embedding_provider: z.enum(['openai', 'gemini', 'claude']).default('openai'),
@@ -69,7 +69,7 @@ export const updateLeadOrderSchema = z.object({
 // ---- Chat ----
 export const chatRequestSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty').max(4000),
-  conversation_id: z.string().uuid().optional(),
+  conversation_id: z.string().uuid().optional().nullable(),
   tenant_slug: z.string().min(1),
   customer_identifier: z.string().optional(),
 });
