@@ -29,6 +29,7 @@ import whatsappWebhookRoutes from './routes/webhooks/whatsapp.js';
 import paymentWebhookRoutes from './routes/webhooks/payments.js';
 
 const app = express();
+app.set('trust proxy', 1);
 const server = createServer(app);
 
 // ---- Global Middleware ----
