@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: chatbot-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-chatbot}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-chatbot_pass}
+      POSTGRES_DB: ${DB_NAME:-chatbot_platform}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-chatbot} -d ${DB_NAME:-chatbot_platform}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: chatbot-redis-prod
+    restart: always
+    command: redis-server --appendonly yes --maxmemory-policy noeviction
+    volumes:
+      - redis_prod_data:/data
+    ports:
+      - "6379:6379"
+
+  server:
+    build:
+      context: .
+      dockerfile: ./packages/server/Dockerfile
+    container_name: chatbot-server-prod
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://${DB_USER:-chatbot}:${DB_PASSWORD:-chatbot_pass}@postgres:5432/${DB_NAME:-chatbot_platform}
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PII_ENCRYPTION_KEY: ${PII_ENCRYPTION_KEY}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN}
+      WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+    ports:
+      - "3001:3001"
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:

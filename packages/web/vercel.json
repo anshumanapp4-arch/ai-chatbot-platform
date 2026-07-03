@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd ../.. && npm ci && npm run build:shared && npm run build:web",
+  "outputDirectory": "dist",
+  "installCommand": "echo 'skipping install, handled in buildCommand'",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}

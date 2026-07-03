@@ -1,0 +1,28 @@
+/* ============================================
+   Dashboard Styles
+   ============================================ */
+
+.dashboard {
+  max-width: 1400px;
+}
+
+.stat-sub {
+  margin-top: var(--space-sm);
+}
+
+.dashboard-chart {
+  margin-top: var(--space-lg);
+}
+
+.chart-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+/* ---- Recharts Overrides ---- */
+.recharts-default-tooltip {
+  background: var(--color-bg-secondary) !important;
+  border-radius: var(--radius-md) !important;
+}

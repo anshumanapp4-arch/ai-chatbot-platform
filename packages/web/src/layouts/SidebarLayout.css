@@ -1,0 +1,206 @@
+/* ============================================
+   Sidebar Layout Styles
+   ============================================ */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---- Sidebar ---- */
+.sidebar {
+  width: 260px;
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: var(--z-sidebar);
+  transition: width var(--transition-base);
+}
+
+.layout--collapsed .sidebar {
+  width: 68px;
+}
+
+.sidebar__header {
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  min-height: 64px;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  overflow: hidden;
+}
+
+.sidebar__logo {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.sidebar__title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  background: var(--color-brand-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+}
+
+.sidebar__toggle {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+.sidebar__toggle:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-input);
+}
+
+/* ---- Navigation ---- */
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-sm);
+  overflow-y: auto;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px 12px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sidebar__link:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-glass);
+}
+.sidebar__link--active {
+  color: var(--color-text-primary);
+  background: rgba(108, 99, 255, 0.1);
+  border-left: 3px solid var(--color-brand-primary);
+}
+.sidebar__link--active .sidebar__icon {
+  transform: scale(1.1);
+}
+
+.sidebar__icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  transition: transform var(--transition-fast);
+}
+
+.sidebar__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Footer ---- */
+.sidebar__footer {
+  padding: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.sidebar__user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: white;
+  flex-shrink: 0;
+}
+
+.sidebar__user-info {
+  overflow: hidden;
+}
+.sidebar__user-email {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sidebar__user-role {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.sidebar__logout {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+.sidebar__logout:hover {
+  color: var(--color-accent-red);
+  border-color: rgba(248, 113, 113, 0.3);
+  background: var(--color-accent-red-bg);
+}
+
+/* ---- Main Content ---- */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: var(--space-xl);
+  min-height: 100vh;
+  transition: margin-left var(--transition-base);
+}
+
+.layout--collapsed .main-content {
+  margin-left: 68px;
+}
+
+@media (max-width: 768px) {
+  .sidebar { width: 68px; }
+  .main-content { margin-left: 68px; }
+  .sidebar__label,
+  .sidebar__title,
+  .sidebar__user-info,
+  .sidebar__user { display: none; }
+}
