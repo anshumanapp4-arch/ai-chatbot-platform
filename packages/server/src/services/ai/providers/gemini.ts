@@ -79,9 +79,9 @@ export class GeminiEmbeddingProvider implements EmbeddingProviderInterface {
   private dimension: number;
 
   constructor(model?: string) {
-    this.model = model || 'text-embedding-004';
+    this.model = model || 'gemini-embedding-2';
     this.apiKey = GEMINI_API_KEY;
-    this.dimension = 768; // text-embedding-004 output dimension is 768
+    this.dimension = 1536; // Standard vector size for OpenAI migration compat
   }
 
   async generateEmbeddings(texts: string[]): Promise<number[][]> {
@@ -98,6 +98,7 @@ export class GeminiEmbeddingProvider implements EmbeddingProviderInterface {
       const requests = batch.map(text => ({
         model: `models/${this.model}`,
         content: { parts: [{ text }] },
+        outputDimensionality: 1536,
       }));
 
       const res = await fetch(

@@ -40,7 +40,7 @@ async function seed() {
   // 3. Create default demo tenant
   await query(
     `INSERT INTO tenants (id, name, slug, status, bot_persona, llm_provider, llm_model, embedding_provider, embedding_model)
-     VALUES ($1, $2, $3, 'active', $4, 'gemini', 'gemini-1.5-flash', 'gemini', 'text-embedding-004')
+     VALUES ($1, $2, $3, 'active', $4, 'gemini', 'gemini-1.5-flash', 'gemini', 'gemini-embedding-2')
      ON CONFLICT DO NOTHING`,
     [
       'd3b07384-d113-4ec6-a5d9-48248bc8fc0f',
@@ -57,7 +57,7 @@ async function seed() {
        llm_provider = 'gemini', 
        llm_model = 'gemini-1.5-flash', 
        embedding_provider = 'gemini', 
-       embedding_model = 'text-embedding-004'`
+       embedding_model = 'gemini-embedding-2'`
   );
   console.log('  ✅ All existing tenants updated to use Google Gemini');
 

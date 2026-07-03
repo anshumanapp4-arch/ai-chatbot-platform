@@ -27,7 +27,7 @@ export const createTenantSchema = z.object({
   llm_provider: z.enum(['openai', 'gemini', 'claude']).default('gemini'),
   llm_model: z.string().default('gemini-1.5-flash'),
   embedding_provider: z.enum(['openai', 'gemini', 'claude']).default('gemini'),
-  embedding_model: z.string().default('text-embedding-004'),
+  embedding_model: z.string().default('gemini-embedding-2'),
 });
 
 export const updateTenantSchema = createTenantSchema.partial().extend({
