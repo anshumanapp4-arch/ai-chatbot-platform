@@ -12,7 +12,7 @@ export class GeminiLLMProvider implements LLMProviderInterface {
   private apiKey: string;
 
   constructor(model?: string) {
-    this.model = model || 'gemini-1.5-flash';
+    this.model = model || 'gemini-2.5-flash';
     this.apiKey = GEMINI_API_KEY;
   }
 
@@ -41,7 +41,7 @@ export class GeminiLLMProvider implements LLMProviderInterface {
     };
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

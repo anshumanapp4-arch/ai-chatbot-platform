@@ -25,7 +25,7 @@ export const createTenantSchema = z.object({
     .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   website_url: z.string().url('Invalid URL').or(z.literal('')).optional().nullable(),
   llm_provider: z.enum(['openai', 'gemini', 'claude']).default('gemini'),
-  llm_model: z.string().default('gemini-1.5-flash'),
+  llm_model: z.string().default('gemini-2.5-flash'),
   embedding_provider: z.enum(['openai', 'gemini', 'claude']).default('gemini'),
   embedding_model: z.string().default('gemini-embedding-2'),
 });
