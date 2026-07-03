@@ -26,9 +26,9 @@ export const config = {
   },
 
   s3: {
-    endpoint: process.env.S3_ENDPOINT || 'http://localhost:9000',
-    accessKey: process.env.S3_ACCESS_KEY || 'minioadmin',
-    secretKey: process.env.S3_SECRET_KEY || 'minioadmin',
+    endpoint: process.env.SUPABASE_S3_ENDPOINT_URL || process.env.S3_ENDPOINT || 'http://localhost:9000',
+    accessKey: process.env.SUPABASE_S3_ACCESS_KEY_ID || process.env.S3_ACCESS_KEY || 'minioadmin',
+    secretKey: process.env.SUPABASE_S3_SECRET_ACCESS_KEY || process.env.S3_SECRET_KEY || 'minioadmin',
     bucket: process.env.S3_BUCKET || 'chatbot-uploads',
     region: process.env.S3_REGION || 'us-east-1',
   },

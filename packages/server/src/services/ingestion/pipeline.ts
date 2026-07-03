@@ -21,48 +21,53 @@ export function chunkText(
 ): ChunkResult[] {
   const { chunkSize = 1000, chunkOverlap = 200, sourceMeta = {} } = options;
 
-  // Clean the text first
+  // Clean the text first, but preserve semantic boundaries (newlines)
   const cleanedText = text
-    .replace(/\s+/g, ' ')
+    .replace(/[ \t]+/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
   if (!cleanedText || cleanedText.length < 50) return [];
 
   const chunks: ChunkResult[] = [];
-  let start = 0;
+  
+  // Semantic chunking based on paragraphs first
+  const paragraphs = cleanedText.split('\n\n');
+  let currentChunk = '';
+  let startOffset = 0;
 
-  while (start < cleanedText.length) {
-    let end = start + chunkSize;
-
-    // Try to break at sentence boundary
-    if (end < cleanedText.length) {
-      const lastSentence = cleanedText.lastIndexOf('.', end);
-      const lastNewline = cleanedText.lastIndexOf('\n', end);
-      const breakPoint = Math.max(lastSentence, lastNewline);
-
-      if (breakPoint > start + chunkSize * 0.5) {
-        end = breakPoint + 1;
-      }
-    } else {
-      end = cleanedText.length;
-    }
-
-    const chunkContent = cleanedText.slice(start, end).trim();
-
-    if (chunkContent.length >= 50) {
+  for (const paragraph of paragraphs) {
+    if (currentChunk.length + paragraph.length > chunkSize && currentChunk.length > 0) {
       chunks.push({
-        content: chunkContent,
+        content: currentChunk.trim(),
         metadata: {
           ...sourceMeta,
-          char_offset: start,
+          char_offset: startOffset,
           chunk_index: chunks.length,
         },
       });
+      // Start new chunk with overlap
+      const overlapStart = Math.max(0, currentChunk.length - chunkOverlap);
+      const overlapText = currentChunk.slice(overlapStart);
+      const firstSentenceOfOverlap = overlapText.indexOf('. ');
+      const cleanOverlap = firstSentenceOfOverlap !== -1 ? overlapText.slice(firstSentenceOfOverlap + 2) : overlapText;
+      
+      currentChunk = cleanOverlap + (cleanOverlap ? '\n\n' : '') + paragraph;
+      startOffset += currentChunk.length - paragraph.length; // Approximate offset
+    } else {
+      currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
     }
+  }
 
-    start = end - chunkOverlap;
-    if (start >= cleanedText.length) break;
+  if (currentChunk.length >= 50) {
+    chunks.push({
+      content: currentChunk.trim(),
+      metadata: {
+        ...sourceMeta,
+        char_offset: startOffset,
+        chunk_index: chunks.length,
+      },
+    });
   }
 
   return chunks;
@@ -71,7 +76,13 @@ export function chunkText(
 // --- Website Crawler ---
 import * as cheerio from 'cheerio';
 import robotsParser from 'robots-parser';
+import TurndownService from 'turndown';
 import { logger } from '../../utils/logger.js';
+
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced'
+});
 
 interface CrawlResult {
   url: string;
@@ -128,15 +139,13 @@ export async function crawlWebsite(
       const html = await response.text();
       const $ = cheerio.load(html);
 
-      // Remove boilerplate elements
-      $('script, style, nav, footer, header, aside, .cookie-notice, .popup, iframe, noscript').remove();
+      // Remove boilerplate elements aggressively
+      $('script, style, nav, footer, header, aside, .cookie-notice, .popup, iframe, noscript, .ads, .sidebar, [role="banner"], [role="navigation"]').remove();
 
       const title = $('title').text().trim();
-      const text = $('main, article, .content, #content, body')
-        .first()
-        .text()
-        .replace(/\s+/g, ' ')
-        .trim();
+      const contentHtml = $('main, article, .content, #content, body').first().html() || '';
+      
+      const text = turndownService.turndown(contentHtml).trim();
 
       if (text.length > 50) {
         results.push({ url, title, text });
@@ -187,8 +196,11 @@ export async function extractPDF(buffer: Buffer): Promise<string> {
 import mammoth from 'mammoth';
 
 export async function extractDOCX(buffer: Buffer): Promise<string> {
-  const result = await mammoth.extractRawText({ buffer });
-  return result.value || '';
+  const result = await mammoth.convertToHtml({ buffer });
+  if (result.value) {
+    return turndownService.turndown(result.value);
+  }
+  return '';
 }
 
 // --- Plain Text ---
